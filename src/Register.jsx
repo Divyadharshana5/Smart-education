@@ -1,5 +1,7 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const Register = () => {
   const [name, setName] = useState("");
@@ -7,15 +9,29 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
     if (password !== confirmPassword) {
       setError("Passwords do not match");
+      toast.error("Passwords do not match");
       return;
     }
-    // Handle register logic
-    setError("");
+
+    try {
+      const res = await axios.post("http://localhost:5000/api/auth/register", {
+        name,
+        email,
+        password,
+      });
+
+      toast.success("Registration successful!");
+
+      navigate("/login");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Registration failed");
+    }
   };
 
   return (
@@ -71,7 +87,7 @@ const Register = () => {
         </form>
         <p className="text-black pt-3">
           Existing User?{" "}
-          <Link to="/Login" className="text-blue-300">
+          <Link to="/login" className="text-blue-300">
             Login
           </Link>
         </p>

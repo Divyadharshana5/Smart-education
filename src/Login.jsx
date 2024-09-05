@@ -1,13 +1,26 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    // Handle login logic
+    try {
+      const res = await axios.post("http://localhost:5000/api/auth/login", {
+        email,
+        password,
+      });
+      localStorage.setItem("token", res.data.token);
+      toast.success("Logged in successfully!");
+      navigate("/dashboard");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Login failed");
+    }
   };
 
   return (
@@ -39,9 +52,9 @@ const Login = () => {
             Login
           </button>
         </form>
-        <p className="text-black pt-3 ">
-          Don&apos;t have a acount?{" "}
-          <Link to="/Register" className="text-blue-300">
+        <p className="text-black pt-3">
+          Don&apos;t have an account?{" "}
+          <Link to="/register" className="text-blue-300">
             Signup
           </Link>
         </p>
